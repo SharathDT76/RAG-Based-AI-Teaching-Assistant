@@ -1,0 +1,22 @@
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# HuggingFace / cache
+.cache/
+*.bin
+*.model
+
+# Media files (skip large data)
+videos/
+audios/
+
+# Generated data
+jsons/
+
+# Optional (if you generate transcripts)
+*.txt
+*.log

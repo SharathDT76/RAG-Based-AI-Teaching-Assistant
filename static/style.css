@@ -1,0 +1,438 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+/* ===================================
+   LIGHT THEME VARIABLES
+=================================== */
+
+:root{
+
+    --bg:#ffffff;
+    --header:#ffffff;
+    --border:#e5e5e5;
+
+    --text:#0f0f0f;
+    --subtext:#606060;
+
+    --card-hover:#f5f5f5;
+
+    --input-bg:#ffffff;
+    --input-border:#d3d3d3;
+
+    --button-bg:#f2f2f2;
+    --button-hover:#e5e5e5;
+
+    --timestamp-bg:#f1f1f1;
+    --timestamp-text:#065fd4;
+
+    --watch-bg:#065fd4;
+    --watch-text:#ffffff;
+
+    --loader-bg:#e5e5e5;
+    --loader-top:#ff0000;
+}
+
+/* ===================================
+   DARK THEME VARIABLES
+=================================== */
+
+body.dark{
+
+    --bg:#0f0f0f;
+    --header:#0f0f0f;
+    --border:#272727;
+
+    --text:#ffffff;
+    --subtext:#aaaaaa;
+
+    --card-hover:#1a1a1a;
+
+    --input-bg:#121212;
+    --input-border:#303030;
+
+    --button-bg:#222222;
+    --button-hover:#3a3a3a;
+
+    --timestamp-bg:#272727;
+    --timestamp-text:#3ea6ff;
+
+    --watch-bg:#272727;
+    --watch-text:#ffffff;
+
+    --loader-bg:#272727;
+    --loader-top:#ff0000;
+}
+
+/* ===================================
+   GLOBAL
+=================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    background:var(--bg);
+    color:var(--text);
+
+    font-family:'Roboto', sans-serif;
+
+    transition:0.3s;
+}
+
+/* ===================================
+   HEADER
+=================================== */
+
+.header{
+
+    position:sticky;
+    top:0;
+
+    background:var(--header);
+
+    padding:16px 24px;
+
+    border-bottom:1px solid var(--border);
+
+    z-index:1000;
+
+    transition:0.3s;
+}
+
+.top-bar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+}
+
+/* ===================================
+   LOGO
+=================================== */
+
+.logo{
+
+    font-size:34px;
+
+    font-weight:700;
+
+    color:var(--text);
+}
+
+/* ===================================
+   THEME BUTTON
+=================================== */
+
+#themeToggle{
+
+    width:50px;
+    height:50px;
+
+    border:none;
+
+    border-radius:50%;
+
+    cursor:pointer;
+
+    font-size:20px;
+
+    background:var(--button-bg);
+
+    color:var(--text);
+
+    transition:0.3s;
+}
+
+#themeToggle:hover{
+
+    transform:scale(1.08);
+
+    background:var(--button-hover);
+}
+
+/* ===================================
+   SEARCH BAR
+=================================== */
+
+.search-container{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+}
+
+.search-container input{
+
+    width:700px;
+
+    height:46px;
+
+    padding:0 18px;
+
+    border:1px solid var(--input-border);
+
+    border-right:none;
+
+    border-radius:40px 0 0 40px;
+
+    background:var(--input-bg);
+
+    color:var(--text);
+
+    font-size:16px;
+
+    outline:none;
+
+    transition:0.3s;
+}
+
+.search-container button{
+
+    width:70px;
+
+    height:46px;
+
+    border:none;
+
+    border-radius:0 40px 40px 0;
+
+    background:var(--button-bg);
+
+    color:var(--text);
+
+    border:1px solid var(--input-border);
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+.search-container button:hover{
+
+    background:var(--button-hover);
+}
+
+/* ===================================
+   RESULTS
+=================================== */
+
+#response{
+
+    width:92%;
+
+    margin:30px auto;
+}
+
+/* ===================================
+   VIDEO CARD
+=================================== */
+
+.yt-card{
+
+    display:flex;
+
+    gap:18px;
+
+    margin-bottom:30px;
+
+    padding:10px;
+
+    border-radius:16px;
+
+    transition:0.3s;
+}
+
+.yt-card:hover{
+
+    background:var(--card-hover);
+}
+
+/* ===================================
+   THUMBNAIL
+=================================== */
+
+.yt-thumbnail{
+
+    width:420px;
+
+    height:236px;
+
+    object-fit:cover;
+
+    border-radius:14px;
+
+    transition:0.3s;
+}
+
+.yt-thumbnail:hover{
+
+    transform:scale(1.01);
+}
+
+/* ===================================
+   INFO
+=================================== */
+
+.yt-info{
+
+    flex:1;
+}
+
+/* ===================================
+   TITLE
+=================================== */
+
+.yt-title{
+
+    font-size:22px;
+
+    font-weight:500;
+
+    line-height:1.4;
+
+    color:var(--text);
+
+    margin-bottom:10px;
+}
+
+/* ===================================
+   META
+=================================== */
+
+.yt-meta{
+
+    color:var(--subtext);
+
+    font-size:14px;
+
+    margin-bottom:12px;
+}
+
+/* ===================================
+   TIMESTAMP
+=================================== */
+
+.yt-time{
+
+    display:inline-block;
+
+    background:var(--timestamp-bg);
+
+    color:var(--timestamp-text);
+
+    padding:6px 12px;
+
+    border-radius:20px;
+
+    font-size:14px;
+
+    margin-bottom:16px;
+}
+
+/* ===================================
+   DESCRIPTION
+=================================== */
+
+.yt-description{
+
+    color:var(--subtext);
+
+    line-height:1.7;
+
+    font-size:15px;
+
+    margin-bottom:20px;
+}
+
+/* ===================================
+   BUTTON
+=================================== */
+
+.yt-button{
+
+    display:inline-block;
+
+    background:var(--watch-bg);
+
+    color:var(--watch-text);
+
+    padding:12px 18px;
+
+    border-radius:22px;
+
+    text-decoration:none;
+
+    font-size:14px;
+
+    font-weight:500;
+
+    transition:0.3s;
+}
+
+.yt-button:hover{
+
+    opacity:0.85;
+}
+
+/* ===================================
+   LOADER
+=================================== */
+
+.loader{
+
+    width:55px;
+    height:55px;
+
+    border:5px solid var(--loader-bg);
+    border-top:5px solid var(--loader-top);
+
+    border-radius:50%;
+
+    margin:80px auto;
+
+    animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+
+    100%{
+        transform:rotate(360deg);
+    }
+}
+
+/* ===================================
+   MOBILE
+=================================== */
+
+@media(max-width:900px){
+
+    .yt-card{
+
+        flex-direction:column;
+    }
+
+    .yt-thumbnail{
+
+        width:100%;
+        height:auto;
+    }
+
+    .search-container input{
+
+        width:100%;
+    }
+
+    .logo{
+
+        font-size:28px;
+    }
+}

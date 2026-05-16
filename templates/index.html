@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sigma AI Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <div class="header">
+
+    <div class="top-bar">
+
+        <div class="logo">
+            Sigma Web Development AI
+        </div>
+
+        <button
+            id="themeToggle"
+            type="button"
+            onclick="toggleTheme()"
+        >
+            🌙
+        </button>
+
+    </div>
+
+    <div class="search-container">
+
+        <input
+            type="text"
+            id="question"
+            placeholder="Search anything..."
+        >
+
+        <button onclick="askQuestion()">
+            Search
+        </button>
+
+    </div>
+
+</div>
+
+<div id="response"></div>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>
