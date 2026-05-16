@@ -20,3 +20,6 @@ jsons/
 # Optional (if you generate transcripts)
 *.txt
 *.log
+# Embedding files
+embeddings.parquet
+*.parquet
