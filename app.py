@@ -1,41 +1,78 @@
+import faiss
 from flask import Flask, render_template, request, jsonify
-import requests
+import logging
+import os
+import time
 import numpy as np
 import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from config import (
+    SIMILARITY_THRESHOLD,
+    DEBUG,
+    RATE_LIMIT
+)
+from services.retrieval_service import (
+    retrieve_chunks
+)
+from services.embedding_service import create_embedding
 
-from video_data import video_links
+from data.video_data import video_links
+# ==========================================
+# LOGGING
+# ==========================================
+
+os.makedirs(
+    "logs",
+    exist_ok=True
+)
+
+logging.basicConfig(
+    filename="logs/app.log",
+    level=logging.INFO,
+    format=(
+        "%(asctime)s | "
+        "%(levelname)s | "
+        "%(message)s"
+    )
+)
 
 app = Flask(__name__)
-
+limiter = Limiter(
+    key_func=get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"]
+)
 # ==========================================
 # LOAD EMBEDDINGS
 # ==========================================
-df = pd.read_parquet("embeddings.parquet")
 
-embedding_matrix = np.vstack(
-    df["embedding"].values
+df = pd.read_parquet(
+    "data/embeddings.parquet"
 )
 
-print("Embeddings Loaded")
-print(f"Total Chunks: {len(df)}")
+index = faiss.read_index(
+    "data/faiss.index"
+)
 
-# ==========================================
-# CREATE EMBEDDING
-# ==========================================
-def create_embedding(text):
+logging.info(
+    "FAISS Index Loaded"
+)
+logging.info(
+    "Embeddings Loaded"
+)
 
-    r = requests.post(
-        "http://localhost:11434/api/embed",
-        json={
-            "model": "nomic-embed-text",
-            "input": text
-        }
+logging.info(
+    f"Total Chunks: {len(df)}"
+)
+logging.info(
+    "Application Started"
+)
+if DEBUG:
+    logging.info(
+        "Running in DEBUG mode"
     )
 
-    r.raise_for_status()
-
-    return r.json()["embeddings"][0]
 
 # ==========================================
 # HOME PAGE
@@ -45,17 +82,61 @@ def home():
 
     return render_template("index.html")
 
+
+# ==========================================
+# HEALTH CHECK
+# ==========================================
+
+@app.route("/health")
+def health():
+
+    return jsonify({
+        "status": "healthy"
+    })
+@app.errorhandler(429)
+def ratelimit_handler(e):
+
+    return jsonify({
+        "error":
+        "Too many requests. Please try again later."
+    }), 429
 # ==========================================
 # SEARCH API
 # ==========================================
 @app.route("/ask", methods=["POST"])
+@limiter.limit(RATE_LIMIT)
 def ask():
 
     try:
+        start_time_request = time.time()
 
         data = request.get_json()
 
-        incoming_query = data["question"]
+        if not data:
+            return jsonify({
+                "error": "No JSON received"
+            }), 400
+
+        incoming_query = data.get(
+            "question",
+            ""
+        ).strip()
+
+        if not incoming_query:
+
+            return jsonify({
+                "error": "Question required"
+            }), 400
+        if len(incoming_query) > 500:
+
+            return jsonify({
+                "error":
+                "Question too long"
+            }), 400
+
+        logging.info(
+            f"Query: {incoming_query}"
+        )
 
         # ==========================================
         # CREATE QUERY EMBEDDING
@@ -67,18 +148,13 @@ def ask():
         # ==========================================
         # SIMILARITY SEARCH
         # ==========================================
-        similarities = cosine_similarity(
-            embedding_matrix,
-            [question_embedding]
-        ).flatten()
-
-        top_results = 8
-
-        max_indx = similarities.argsort()[::-1][
-            :top_results
-        ]
-
-        new_df = df.iloc[max_indx]
+        new_df, similarities, max_indx = (
+            retrieve_chunks(
+                question_embedding,
+                index,
+                df
+            )
+        )
 
         # ==========================================
         # BUILD HTML
@@ -92,11 +168,11 @@ def ask():
         ):
 
             similarity_score = similarities[
-                max_indx[rank]
+                rank
             ]
 
             # Skip weak matches
-            if similarity_score < 0.55:
+            if similarity_score < SIMILARITY_THRESHOLD:
                 continue
 
             video_number = int(row["number"])
@@ -192,30 +268,36 @@ def ask():
             </div>
             """
 
+        elapsed = round(
+            time.time() - start_time_request,
+            2
+        )
+
+        logging.info(
+            f"Search completed in {elapsed}s"
+        )
+
         return jsonify({
             "answer": results_html
         })
 
-    except Exception as e:
+    except Exception:
 
-        print(e)
+        logging.exception(
+            "Search Failed"
+        )
 
         return jsonify({
-            "answer": f"""
-
+            "answer": """
             <div class="error-box">
-
-                <h2>Error</h2>
-
-                <p>{str(e)}</p>
-
+                Something went wrong.
             </div>
             """
-        })
+        }), 500
 
 # ==========================================
 # RUN APP
 # ==========================================
 if __name__ == "__main__":
 
-    app.run(debug=True)
+    app.run(debug=DEBUG)
