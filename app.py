@@ -47,31 +47,42 @@ limiter = Limiter(
 # LOAD EMBEDDINGS
 # ==========================================
 
-df = pd.read_parquet(
-    "data/embeddings.parquet"
-)
+# ==========================================
+# LOAD DATA
+# ==========================================
 
-index = faiss.read_index(
-    "data/faiss.index"
-)
+df = None
+index = None
 
-logging.info(
-    "FAISS Index Loaded"
-)
-logging.info(
-    "Embeddings Loaded"
-)
 
-logging.info(
-    f"Total Chunks: {len(df)}"
-)
-logging.info(
-    "Application Started"
-)
-if DEBUG:
-    logging.info(
-        "Running in DEBUG mode"
-    )
+def load_data():
+
+    global df
+    global index
+
+    if df is None:
+
+        df = pd.read_parquet(
+            "data/embeddings.parquet"
+        )
+
+        logging.info(
+            "Embeddings Loaded"
+        )
+
+        logging.info(
+            f"Total Chunks: {len(df)}"
+        )
+
+    if index is None:
+
+        index = faiss.read_index(
+            "data/faiss.index"
+        )
+
+        logging.info(
+            "FAISS Index Loaded"
+        )
 
 
 # ==========================================
@@ -109,6 +120,7 @@ def ask():
 
     try:
         start_time_request = time.time()
+        load_data()
 
         data = request.get_json()
 
